@@ -1,0 +1,32 @@
+{
+  "name": "app-gestion-sence",
+  "version": "1.0.0",
+  "description": "Aplicación Web de gestón de usuarios y datos",
+  "keywords": [
+    "node",
+    "express",
+    "usuarios",
+    "api"
+  ],
+  "homepage": "https://github.com/AlxDRF616/app-gestion-sence#readme",
+  "bugs": {
+    "url": "https://github.com/AlxDRF616/app-gestion-sence/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlxDRF616/app-gestion-sence.git"
+  },
+  "license": "ISC",
+  "author": "Alex Rodriguez",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

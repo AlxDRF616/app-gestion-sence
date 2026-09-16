@@ -24,3 +24,22 @@ Se utiliza principalmente para desarrollar aplicaciones y servicios del lado del
  
  ![diagrama-flujo-servidor-a-cliente](/docs/diagrama-flujo-servidor-cliente.png)
 ---
+
+### Lección 2: Instalación y configuración de Node
+El proyecto fue configurado usando Node.js v24.12.0 y npm v12.0.2. Se utilizó `npm init`para crear el archivo `package.json`
+y se añadio `index.js` como punto de partida de la aplicación.
+
+Se estableció `index.js`porque permite identificar claramente el punto desde donde se inicia la aplicación.
+
+También se incorporó `dotenv` para gestionar variables de entorno mediante el archivo `.env` el cuál actualmente
+está utilizando la variable `PORT` para definir el puerto de la aplicación.
+
+![captura-código-index-lección2](/docs/captura-codigo-index-L2.png)
+
+Todo esto fue validado ejecutando el archivo.
+
+![captura-resultado-ejecución-index-leccion2](/docs/captura-resultado-ejecucion-index-L2.png)
+
+Los archivos utilizados en el desarrollo como `.env` y la carpeta `node_modules` fueron excluidos del control de versiones
+mediante `.gitignore`.
+---
