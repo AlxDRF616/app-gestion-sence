@@ -43,3 +43,31 @@ Todo esto fue validado ejecutando el archivo.
 Los archivos utilizados en el desarrollo como `.env` y la carpeta `node_modules` fueron excluidos del control de versiones
 mediante `.gitignore`.
 ---
+### Lección 3: Gestión de paquetes en Node
+Se añadieron los paquetes necesarios para continuar con el desarrollo del backend:
+- **Express:** framework para construir el servidor y las rutas de la aplicación.
+- **dotenv:** permite cargar variables de entorno desde el archivo `.env`.
+- **Nodemon:** herramienta utilizada durante el desarrollo para reiniciar automáticamente la aplicación cuando se detectan cambios.
+
+Express y dotenv se declararon como dependencias del proyecto, mientras que Nodemon se configuró como dependencia de desarrollo.
+
+#### Instalación
+Despues de clonar el repositorio, las dependencias pueden instalarse ejecutando:
+
+`npm install`
+
+#### Ejecución
+Para ejecutar la aplicación normalmente:
+`npm start`
+
+Para ejecutar la aplicación durante el desarrollo utilizando Nodemon:
+`npm run dev`
+
+#### Scripts
+Se definieron dos scripts personalizados en `package.json`:
+- `npm start`: Ejecuta la aplicación mediante Node.js y está destinado a la ejecución normal del proyecto.
+- `npm run dev`: Ejecuta la aplicación mediante Nodemon, permitiendo reinicios automáticos durante el desarrollo.
+>Se mantuvieron estos nombres por ser convenciones haituales de proyectos **Node.js** y por diferenciar claramente la ejecución
+normal de la ejecución orientada al desarrollo.
+
+>Cabe destacar que ambos scripts fueron probados correctamente mediante la terminal.
