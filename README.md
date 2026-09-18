@@ -76,7 +76,7 @@ normal de la ejecución orientada al desarrollo.
 
 ---
 
-### Lección 4 - Sirviendo contenido Web
+### Lección 4: Sirviendo contenido Web
 Se configuró **Express** para servir contenido web mediante rutas públicas y archivos estáticos.
 
 #### Rutas públicas 
@@ -108,3 +108,29 @@ El archivo `public/index.html` puede accederse directamente mediante:
 
 - Contenido estático `/index.html`
 ![captura-ruta-contenido-estatico](/docs/captura-ruta-contenido-estatico-L4.png)
+
+---
+
+### Lección 5: Persistencia en archivos planos
+Se implementó un sistema simple de registro utilizando el módulo `fs` de **Node.js**.
+
+Cada vez que se accede a la ruta `/status`, se registra una línea en `log.txt` utilizando `fs.appendFile()`.
+
+Cada registro contiene:
+- Fecha.
+- Hora.
+- Ruta accedida.
+
+Ejemplo:
+```
+fecha | hora | ruta
+18-09-2026 | 01:03:45 a. m. | /status
+```
+
+>Se eligió registrar las visitas a `/status` porque permite demostrar de forma sencilla la persistencia de eventos generados
+por las solicitudes HTTP. El archivo conserva los registros anteriores y agrega cada nueva visita al final mediante `fs.appendFile()`.
+
+#### Evidencia
+El archivo `log.txt` contiene al menos tres accesos registrados a la ruta `/status`.
+
+![captura-resultado-logs](/docs/captura-log-L5.png)
