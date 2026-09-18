@@ -7,6 +7,20 @@ const express = require("express");
 // Importación del módulo de Node.js para trabajar con el sistema de archivos.
 const fs = require("fs");
 
+// Importación de pool de conexiones a la base de datos.
+const db = require("./config/database");
+
+// Consulta de prueba para verificar el acceso a la base de datos.
+db.query("SELECT * FROM usuarios", (error, resultados) => {
+    if (error) {
+        console.error("Error al consultar usuarios:", error.message);
+        return;
+    }
+
+    console.log("Consulta de usuarios realizada correctamente.");
+    console.log("Registros encontrados:", resultados.length);
+});
+
 // Crea la aplicación Express.
 const app = express();
 

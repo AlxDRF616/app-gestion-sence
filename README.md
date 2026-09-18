@@ -32,7 +32,7 @@ Se utiliza principalmente para desarrollar aplicaciones y servicios del lado del
 ---
 
 ### Lección 2: Instalación y configuración de Node
-El proyecto fue configurado usando Node.js v24.12.0 y npm v12.0.2. Se utilizó `npm init`para crear el archivo `package.json`
+El proyecto fue configurado usando Node.js v24.21.0 y npm v12.0.2. Se utilizó `npm init`para crear el archivo `package.json`
 y se añadio `index.js` como punto de partida de la aplicación.
 
 Se estableció `index.js`porque permite identificar claramente el punto desde donde se inicia la aplicación.
@@ -190,9 +190,9 @@ El proyecto utiliza una estructura modular que permite separar las distintas res
 |- middlewares/  -> Middlewares de Express
 |- public/       -> Contenido estático
 |- routes/       -> Rutas de la aplicación
-|- .env/         -> Variables de entorno local
-|- .env.example/ -> Ejemplo de configuración de variables
-|- .gitignore/   -> Archivos excluidos de Git
+|- .env          -> Variables de entorno local
+|- .env.example  -> Ejemplo de configuración de variables
+|- .gitignore    -> Archivos excluidos de Git
 |- index.js      -> Punto de entrada de la aplicación
 |- package.json  -> Configuración y dependencias
 |- package-lock.json
@@ -212,3 +212,80 @@ Se comprobó que:
 - La estructura del proyecto se encuentra organizada de acuerdo con los requisitos de la actividad.
 
 ---
+
+## Módulo 7
+### Lección 1: Conexión a base de datos
+
+En esta lección se configuró la conexion entre el servidor **Node.js** y una base de datos relacional **MySQL**, utilizando el paquete `mysql2`.
+
+Para el proyecto se creó una base de datos llamada `app_gestion_sence` y una tabla principal llamada `usuarios`.
+
+#### Base de datos
+
+La base de datos utilizada es:
+`app_gestion_sence`, la cual posee una tabla principal denominada `usuarios`, la cual posee los siguientes campos:
+- `id`: Identificador único y clave primaria.
+- `nombre`: Nombre del usuario.
+- `email`: Correo electrónico, configurado como único.
+- `password`: Campo destinado al almacenamiento de la contraseña protegida.
+- `fecha_creacion`: Fecha y hora de creación del registro.
+
+#### Cliente de conexión
+
+Se utilizó el paquete `mysql2` para establecer la conexión entre **Node.js** y **MySQL**.
+
+>Se eligió **mysql2** porque permite conectar directamente la aplicación Node.js con MySQL y ejecutar consultas SQL desde el backend.
+Además, permite trabajar posteriormente con consultas parametrizadas y pools de conexion, facilitano el desarrollo de una aplicación que
+pueda manejar múltiples solicitudes.
+
+La conexión se encuentra separada en el archivo:
+
+`config/database.js`
+
+En este archivo se utiliza un pool de conexiones para administrar la comunicación entre la aplicación y la base de datos.
+
+#### Variables de entorno
+
+Las credenciales y datos de conexión no se escriben directamente en el código fuente. Se almacenan mediante variables de entrorno en el archivo `.env`.
+
+```
+DB_HOST
+DB_PORT
+DB_NAME
+DB_USER
+DB_PASSWORD
+```
+
+El archivo `.env` se encuentra incluido en `.gitignore`, por lo que sus valores no forman parte del repositorio público.
+
+El archivo `.env.example` permite documentar las variables necesarias sin exponer sus valores reales.
+
+#### Protección de datos sensibles
+
+Los datos sensibles se protegen evitando incluir credenciales directamente en los archivos JavaScript o en el repositorio.
+
+El proyecto utiliza `dotenv` para cargar las variables de entorno durante la ejecución y `.gitignore` para impedir que el archivo `.env` sea incluido en el control de versiones.
+
+De esta forma, las credenciales utislizadas para acceder a la base de datos permanecen separadas del código fuente.
+
+#### Validación de la conexión
+
+Se ejecutó la aplicación mediante:
+
+`npm run dev`
+
+La conexión con MySQL fue establecida correctamente y posteriormente se realizó una consulta de prueba sobre la tabla `usuarios`.
+
+Como la tabla todavia no contiene registros, la consulta devolvió:
+
+`Registros encontrados: 0`
+
+Este resultado confirma que **Node.js** pudo conectarse correctamente a la base de datos y consultar la tabla.
+
+#### Evidencia
+
+![captura-enlace-sql-L1-M7.png](/docs/captura-enlace-sql-L1-M7.png)
+
+---
+
+
