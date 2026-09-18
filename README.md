@@ -134,3 +134,75 @@ por las solicitudes HTTP. El archivo conserva los registros anteriores y agrega 
 El archivo `log.txt` contiene al menos tres accesos registrados a la ruta `/status`.
 
 ![captura-resultado-logs](/docs/captura-log-L5.png)
+
+---
+
+### Lección 6: Ejecución de un aplicativo Node
+Se validó la ejecución de la aplicación **Node.js** mediante `npm run dev` y se comprobó el funcionamiento
+de las rutas creadas durante las lecciones anteriores.
+
+#### Requisitos del sistema
+
+Para ejecutar el proyecto se requiere:
+
+- Node.js 18 o superior.
+- npm.
+- Git.
+
+La versión utilizada durante el desarrollo fue Node.js 24.21.0.
+
+#### Instalación
+
+Después de clonar o descargar el repositorio, instalar las dependencias mediante:
+`npm install`
+
+Luego se debe crear un archivo `.env` a partir de `.env.example` y configurar el puerto de ejecución:
+`PORT=3000`
+
+#### Ejecución
+
+Para iniciar la aplicación normalmente:
+`npm start`
+
+Para ejecutar la aplicación durante el desarrollo utilizando Nodemon:
+`npm run dev`
+
+#### Ejemplos de uso
+
+Con el servidor ejecutándose en el puerto 3000, se pueden consultar las siguientes rutas por el momento:
+- `GET /`: Muestra la página principal generada por **Express**.
+- `GET /status`: Devuelve información sobre el estado del servidor en formato **JSON**.
+- `GET /index.html`: Muestra el contenido estático ubicado en la carpeta `public/`.
+
+#### Estructura del proyecto
+
+El proyecto utiliza una estructura modular que permite separar las distintas responsabilidades de la aplicación:
+```
+|- controllers/  -> Controladores de la aplicación
+|- docs/         -> Evidencias y documentacion del proyecto
+|- logs/         -> Archivo de registro
+|- middlewares/  -> Middlewares de Express
+|- public/       -> Contenido estático
+|- routes/       -> Rutas de la aplicación
+|- .env/         -> Variables de entorno local
+|- .env.example/ -> Ejemplo de configuración de variables
+|- .gitignore/   -> Archivos excluidos de Git
+|- index.js      -> Punto de entrada de la aplicación
+|- package.json  -> Configuración y dependencias
+|- package-lock.json
+|- README.md     -> Documentación del proyecto
+```
+
+Las carpetas `routes`, `controllers` y `middlewares` se incorporan desde esta etapa para mantener una estructura preparada para la modularización de la aplicación en las siguientes etapas del proyecto.
+
+La carpeta `logs` contiene el archivo utilizado para la persistencia de los registros de acceso generados por la aplicación.
+
+#### Estado de la validación
+
+Se comprobó que:
+- La aplicación inicia correctamente mediante `npm run dev`.
+- Las rutas `/`, `/status` e `/index.html` responden correctamente.
+- El archivo `logs/log.txt` registra los accesos realizados.
+- La estructura del proyecto se encuentra organizada de acuerdo con los requisitos de la actividad.
+
+---

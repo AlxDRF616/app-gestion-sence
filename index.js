@@ -22,7 +22,7 @@ function registrarVisita(ruta) {
 
     const registro = `${fecha} | ${hora} | ${ruta}\n`;
 
-    fs.appendFile("log.txt", registro, (error) => {
+    fs.appendFile("logs/log.txt", registro, (error) => {
         if (error) {
             console.error("Error al registrar la visita:", error);
         }
