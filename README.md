@@ -465,3 +465,109 @@ Además, los cambios fueron comprobados directamente en MySQL. El usuario con `i
 ![captura-validacion-id](/docs/captura-validacion-id-L3-M7.png)
 
 ---
+
+### Lección 4: Transaccionalidad
+
+En esta lección se implementó una operación transaccional que permite registrar un usuario y crear su historial como parte de una misma transacción en MySQL.
+
+La operación se encuentra en:
+
+`routes/usuarios.js`
+
+La ruta implementada es:
+
+`POST /usuarios/transaccion`
+
+#### Operaciones realizadas
+
+La transacción realiza dos acciones consecutivas:
+
+1. Inserta un nuevo usuario en la tabla `usuarios`.
+2. Crea un registro asociado en la tabla `historial_usuarios`.
+
+Ambas operaciones utilizan la misma conexión de MySQL y forman parte de una única transacción.
+
+La secuencia implementada es:
+
+`BEGIN -> Crear usuario -> Crear historial -> COMMIT`
+
+Si alguna de las operaciones falla, se ejecuta `ROLLBACK`:
+
+`BEGIN -> Crear usuario -> Error al crear historial -> ROLLBACK`
+
+De esta manera se evita que una de las operaciones quede almacenada cuando la otra no pudo completarse correctamente.
+
+#### Tabla de historial
+
+Para registrar la segunda operación se creó la tabla `historial_usuarios`, relacionada con `usuarios` mediante una clave foránea.
+
+La tabla contiene:
+
+- `id`: Identificador del registro.
+- `usuario_id`: Usuario asociado al historial.
+- `accion`: Descripción de la acción realizada.
+- `fecha`: Fecha y hora del registro.
+
+La relación mediante clave foránea permite mantener la integridad entre ambas tablas.
+
+#### Confirmación de la transacción
+
+Cuando las dos operaciones se ejecutan correctamente, se utiliza `COMMIT` para confirmar los cambios.
+
+Se realizó una prueba utilizando el usuario `Ana Torres`.
+
+La API respondió:
+
+```
+{
+    "mensaje": "Usuario e historial creados correctamente."
+}
+```
+
+Posteriormente se comprobó directamente en MySQL que el usuario y su registro de historial habían sido almacenados correctamente.
+
+#### Rollback ante un error
+
+Para comprobar el funcionamiento del `ROLLBACK`, se implementó un mecanismo de prueba mediante el campo `forzarError`.
+
+Cuando este campo tiene el valor `true`, se provoca intencionalmente un error durante la creación del historial.
+
+La API respondió:
+
+```
+{
+    "error": "La segunda operación falló. La transacción fue revertida."
+}
+```
+
+Posteriormente se consultó MySQL buscando el usuario utilizado para la prueba.
+
+`rollback@example.com`
+
+El resultado fue `Empty set`, demostrando que el usuario tampoco quedó almacenado.
+
+Esto confirma que el `ROLLBACK` revirtió la primera operación después de que la segunda fallara.
+
+#### Logs de la transacción
+
+Durante la ejecución se registran mensaje en la consola para indicar el estado de la operación, incluyendo:
+
+- Inicio de la trnsacción.
+- Creación del usuario.
+- Creación del historial.
+- Confirmación mediante `COMMIT`.
+- Errores y reversión mediante `ROLLBACK`.
+
+#### Evidencias
+
+- Transacción exitosa y confirmación mediante `COMMIT`
+
+![captura-transaccion-exitosa](/docs/captura-transaccion-exitosa-L4-M7.png)
+
+- Error forzado y comprobación del `ROLLBACK`
+
+![captura-rollback-1](/docs/captura-rollback-L4-M7-1.png)
+
+![captura-rollback-2](/docs/captura-rollback-L4-M7-2.png)
+
+---
