@@ -27,6 +27,9 @@ db.query("SELECT * FROM usuarios", (error, resultados) => {
 // Crea la aplicación Express.
 const app = express();
 
+// Permite recibir datos en formato JSON desde las solicitudes.
+app.use(express.json());
+
 // Registro de rutas de usuarios en la aplicación.
 app.use(usuariosRoutes);
 

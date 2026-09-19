@@ -3,7 +3,8 @@
 ### Evidencias del proyecto
 
 Las evidencias y reflexiones tal y como fueron solicitadas se encuentran organizadas en Google Drive.
-[Google Drive](https://drive.google.com/drive/folders/1WkUt979tqvtwyH30au0nBobpMg18Nie6?usp=sharing)
+
+[¡Click aquí para ingresar a la carpeta compartida!](https://drive.google.com/drive/folders/1WkUt979tqvtwyH30au0nBobpMg18Nie6?usp=sharing)
 
 ## Módulo 6
 ### Lección 1:
@@ -361,5 +362,106 @@ La respuesta fue entregada correctamente en formato JSON y contiene los tres reg
 - Registro de la ruta GET`/usuarios`
 
 ![captura-ruta-usuarios](/docs/captura-ruta-usuarios-L2-M7.png)
+
+---
+
+### Lección 3: Modificación de datos en una base de datos
+
+En esta lección se incorporaron operaciones de modificación y eliminación sobre los registros existentes de la tabla `usuarios`.
+
+Se implementaron las siguientes rutas:
+
+- `PUT /usuarios/:id`: Permite modificar determinados datos de un usuario.
+- `DELETE /usuarios/:id`: Permite eliminar un usuario existente.
+
+Las rutas se encuentran en:
+
+`routes/usuarios.js`
+
+#### Modificación de usuarios
+
+La ruta `PUT /usuarios/:id` permite modificar únicamente los campos `nombre` y `email`.
+
+Se decidió limitar la actualización a estos campos porque corresponden a datos del perfil del usuario que pueden cambiar durante la utilización de la aplicación.
+
+No se permite modificar:
+
+- `id`: Identifica de forma única al usuario y funciona como clave primaria.
+- `fecha_creacion`: Representa el momento en el que se creó el registro y no debería cambiar durante una actualización.
+- `password`: No se modifica mediante esta ruta, ya que posteriormente debería existir un flujo específico para el cambio de contraseña.
+
+La ruta construye la consulta `UPDATE` únicamente con los campos que fueron enviados en la solicitud.
+
+#### Validaciones aplicadas
+
+Antes de realizar la actualización se verifica que se haya proporcionado al menos uno de los campos permitidos:
+
+- `nombre`
+- `email`
+
+Si no se proporciona ninguno, la API devuelve una respuesta HTTP `400`.
+
+También se verifica previamente que el ID recibido corresponda a un usuario existente.
+
+Si el usuario no existe, la API devuelve una respuesta HTTP `404` con el mensaje:
+
+```
+{
+    "error": "Usuario no encontrado."
+}
+```
+
+Los errores producidos durante las consultas a MySQL se controlan mediante una respuesta HTTP `500`, evitando exponer detalles internos de la base de datos al cliente.
+
+#### Eliminación de usuarios
+
+La ruta `DELETE /usuarios/:id` permite eliminar un usuario mediante su identificador.
+
+Antes de ejecutar la eliminación se realiza una consulta para verificar que el usuario exista.
+
+Si el ID no corresponde a ningún registro, la operación se detiene y se devuelve una respuesta HTTP `404`.
+
+Si el usuario existe, se ejecuta la consulta:
+
+`DELETE FROM usuarios WHERE id = ?`
+
+En caso de que la operación se complete correctamente, la API devuelve:
+
+```
+{
+    "mensaje": "Usuario eliminado correctamente."
+}
+```
+
+#### Resultados de las pruebas
+
+Se realizaron pruebas tanto con IDs existentes como con IDs inexistentes.
+
+Para la modificación:
+
+- `PUT /usuarios/4`: Actualización realizada correctamente.
+- `PUT /usuarios/999`: Se devolvió `Usuario no encontrado.`
+
+Para la eliminación:
+
+- `DELETE /usuarios/6`: Eliminación realizada correctamente durante pruebas funcionales.
+- `DELETE /usuarios/5`: Eliminación realizada correctamente como prueba para generar evidencia.
+- `DELETE /usuarios/999`: Se devolvió `Usuario no encontrado.`
+
+Además, los cambios fueron comprobados directamente en MySQL. El usuario con `id = 4` quedó actualizado y los usuarios utilizados en las pruebas de eliminación fueron eliminados correctamente.
+
+#### Evidencias
+
+- Actualización exitosa mediante `PUT /usuarios/:id`
+
+![captura-put-usuario](/docs/captura-put-usuario-L3-M7.png)
+
+- Eliminación exitosa mediante `DELETE /usuarios/:id`
+
+![captura-delete-usuario](/docs/captura-delete-usuario-L3-M7.png)
+
+- Validación de ID inexistente en las operaciones `PUT` y `DELETE`
+
+![captura-validacion-id](/docs/captura-validacion-id-L3-M7.png)
 
 ---
