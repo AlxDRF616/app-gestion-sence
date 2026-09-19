@@ -10,6 +10,9 @@ const fs = require("fs");
 // Importación de pool de conexiones a la base de datos.
 const db = require("./config/database");
 
+// Importación de rutas relacionadas con los usuarios.
+const usuariosRoutes = require("./routes/usuarios");
+
 // Consulta de prueba para verificar el acceso a la base de datos.
 db.query("SELECT * FROM usuarios", (error, resultados) => {
     if (error) {
@@ -23,6 +26,9 @@ db.query("SELECT * FROM usuarios", (error, resultados) => {
 
 // Crea la aplicación Express.
 const app = express();
+
+// Registro de rutas de usuarios en la aplicación.
+app.use(usuariosRoutes);
 
 // Define el puerto utilizando la variable de entorno PORT.
 const PORT = process.env.PORT || 3000;

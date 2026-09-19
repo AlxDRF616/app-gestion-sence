@@ -289,3 +289,77 @@ Este resultado confirma que **Node.js** pudo conectarse correctamente a la base 
 ---
 
 
+### Lección 2: Obtención de información desde una base de datos
+
+En esta lección se implementó una ruta **`GET /usuarios`** que permite consultar los registros almacenados en la tabla `usuarios` de la base de datos MySQL y devolverlos mediante una respuesta JSON.
+
+Para realizar la consulta se reutilizó el pool de conexiones configurado en:
+
+`config/database.js`
+
+La ruta se encuentra en:
+
+`routes/usuarios.js`
+
+#### Datos de prueba
+
+Se agregaron tres registros simulados a la tabla `usuarios` para comprobar el funcionamiento de la consulta:
+
+- Juan Perez
+- Maria Gonzalez
+- Pedro Soto
+
+Los registros fueron verificados directamente en MySQL.
+
+#### Consulta de usuarios
+
+La ruta utiliza una consulta SQL que solicita únicamente los campos necesarios:
+
+`SELECT id, nombre, email, fecha_creacion FROM usuarios;`
+
+No se incluye el campo `password` en la consulta.
+
+Posteriormente, los resultados obtenidos desde MySQL son procesados mediante `map()` para construir nuevos objetos con los campos que serán enviados al cliente.
+
+De esta forma, la respuesta queda limitada a:
+
+- `id`
+- `nombre`
+- `email` 
+- `fecha_creacion`
+
+Esto evita exponer contraseñas u otros datos que no deberían formar parte de la respuesta pública de la API.
+
+#### Manejo de errores
+
+La consulta incluye un manejo de errores mediante una condición `if (error)...`.
+
+Si ocurre un problema al realizar la consulta, el servidor registra el error en la consola y devuelve una respuesta HTTP `500` con un mensaje general:
+
+```
+{
+    "error": "No fue posible obtener los usuarios."
+}
+```
+
+De esta manera, el cliente no recibe información interna sobre el error de la base de datos.
+
+#### Resultado
+
+La ruta fue probada mediante:
+
+`GET http://localhost:3000/usuarios`
+
+La respuesta fue entregada correctamente en formato JSON y contiene los tres registros almacenados en MySQL, sin incluir el campo `password`.
+
+#### Evidencias
+
+- Registros almacenados en MySQL
+
+![captura-insercion-datos-sql](/docs/captura-insercion-datos-sql-L2-M7.png)
+
+- Registro de la ruta GET`/usuarios`
+
+![captura-ruta-usuarios](/docs/captura-ruta-usuarios-L2-M7.png)
+
+---
