@@ -571,3 +571,152 @@ Durante la ejecución se registran mensaje en la consola para indicar el estado 
 ![captura-rollback-2](/docs/captura-rollback-L4-M7-2.png)
 
 ---
+
+### Lección 5: Acceso a datos con ORM
+
+En esta lección se incorporó **Sequelize** como ORM para complementar las consultas SQL manuales utilizadas en las lecciones anteriores.
+
+El objetivo fue consultar la tabla `usuarios` utilizando un modelo de JavaScript y comparar el resultado obtenido mediante ORM con la consulta SQL tradicional.
+
+#### Instalación de Sequelize
+
+Sequelize fue instalado mediante:
+
+`npm install sequelize`
+
+>El proyecto ya contaba con `mysql2`, utilizado como controlador para la conexión con MySQL.
+
+#### Configuración de Sequelize
+
+Se creó el archivo:
+
+`config/sequelize.js`
+
+Este archivo configura la conexión de Sequelize utilizando las variables de entorno definidas en `.env`.
+
+Se mantuvo la misma configuración de base de datos utilizada por la aplicación:
+
+- Host.
+- Puerto.
+- Nombre de la base de datos.
+- Usuario.
+- Contraseña.
+
+La conexión fue comprobada mediante `sequelize.authenticate()` y se confirmó correctamente la comunicación entre Node.js, Sequelize y MySQL.
+
+#### Modelo User
+
+Se creó el modelo:
+
+`models/User.js`
+
+El modelo `User` representa la tabla existente:
+
+`usuarios`
+
+Se definieron los campos:
+
+- `id`
+- `nombre`
+- `email`
+- `password`
+- `fecha_creacion`
+
+Se configuró `tableName: "usuarios"` para utilizar la tabla existente y `timestamps: false` para evitar que Sequelize agregue automáticamente los campos `createdAt` y `updatedAt`.
+
+#### Consulta mediante ORM
+
+Se creó la ruta:
+
+`GET /usuarios/orm`
+
+Esta ruta utiliza el método `User.findAll()` de Sequelize para obtener los registros de la tabla `usuarios`.
+
+Para mantener la comparación equivalente con la consulta SQL manual, se solicitaron únicamente los campos:
+
+```
+id
+nombre
+email
+fecha_creacion
+```
+
+La consulta ORM utilizada conceptualmente es:
+
+```
+JS
+
+User.findAll({
+    attributes: ["id", "nombre", "email", "fecha_creacion"]
+});
+```
+
+#### Comparación entre SQL manual y ORM
+
+La aplicación ya contaba ccon la ruta:
+
+`GET /usuarios`
+
+que obtiene los usuarios mediante una consulta SQL manual.
+
+La nueva ruta:
+
+`GET /usuarios/orm`
+
+realiza la misma consulta utilizando **Sequelize**.
+
+La comparación realizada entregó los mismos 2 registros mediante ambas rutas:
+
+- Juan Actualizado
+- Ana Torres
+
+En ambos casos se obtuvieron los campos:
+
+- `id`
+- `nombre`
+- `email`
+- `fecha_creacion`
+
+Esto permitió comprobar que el acceso mediante ORM obtiene los mismos datos que la consuta SQL manual.
+
+#### Ventaja encontrada al utilizar ORM
+
+La principal ventaja observada durante esta implementación fue la abstracción de las consultas SQL.
+
+Con SQL manual es necesario escribir directamente la consulta:
+
+```
+SQL
+
+SELECT id, nombre, email, fecha_creacion
+FROM usuarios;
+```
+
+Mientras que con **Sequialize** es posible utilizar métodos del modelo:
+
+```
+JS
+
+User.findAll({
+    attributes: ["id", "nombre", "email", "fecha_creacion"]
+});
+```
+
+Esto permite trabajar con los datos utilizando objetos y métodos de JavaScript, reduciendo la necesidad de escribir SQL directamente y facilitando la reutilización de los modelos cuando la aplicación crece.
+
+Sin embargo, el ORM no elimina la necesidad de comprender SQL, ya que Sequelize genera consultas SQL internamente y sigue siendo necesario conocer la estructura y relaciones de la base de datos.
+
+#### Evidencia
+
+Se realizó una comparación entre las rutas:
+
+```
+GET /usuarios
+GET /usuarios/orm
+```
+
+Ambas rutas devolvieron los mismos registros y campos.
+
+![captura-comparacion-orm](/docs/captura-comparacion-orm-L5-M7.png)
+
+---

@@ -4,6 +4,9 @@ const express = require("express");
 // Importación el pool de conexiones a MySQL.
 const db = require("../config/database");
 
+//Importación del modelo User para el ORM
+const User = require("../models/User");
+
 // Crea un router de Express.
 const router = express.Router();
 
@@ -251,6 +254,23 @@ router.post("/usuarios/transaccion", (req, res) => {
             );
         });
     });
+});
+
+// Ruta GET para consultar usuarios utilizando Sequelize.
+router.get("/usuarios/orm", async (req, res) => {
+    try {
+	const usuarios = await User.findAll({
+	    attributes: ["id", "nombre", "email", "fecha_creacion"]
+	});
+
+	res.json(usuarios);
+    } catch (error) {
+	console.error("Error al consultar usuarios con Sequelize:", error.message);
+
+	res.status(500).json({
+	    error: "No fie posible consultar los usuarios mediante ORM."
+	});
+    }
 });
 
 module.exports = router;
