@@ -720,3 +720,138 @@ Ambas rutas devolvieron los mismos registros y campos.
 ![captura-comparacion-orm](/docs/captura-comparacion-orm-L5-M7.png)
 
 ---
+
+### Lección 6: Manejo de relaciones en un ORM
+
+En esta lección se implementaron relaciones entre modelos utilizando **Sequelize**, con el objetivo de consultar información relacionada mediante ORM.
+
+Para aprovechar las tablas existentes del proyecto, se utilizó la relación entre:
+
+- `usuarios`
+- `historial_usuarios`
+
+La tabla `historial_usuarios` contiene la información de las acciones realizadas por cada usuario mediante la clave foránea `usuario_id`.
+
+#### Modelo HistorialUsuario
+
+Se creó el modelo:
+
+`models/HistorialUsuario.js`
+
+Este modelo representa la tabla existente:
+
+`historial_usuarios`
+
+Se definieron los campos:
+
+- `id`
+- `usuario_id`
+- `accion`
+- `fecha`
+
+Al igual que el modelo `User`, se configuró `tableName` para utilizar la tabla existente y `timestamps: false` para evitar que Sequelize agregue campos adicionales.
+
+#### Relación entre los modelos
+
+La relación se configuró en:
+
+`models/associations.js`
+
+Se definió una relación de tipo uno a muchos:
+
+```
+JS
+
+User.hasMany(HistorialUsuario, {
+    foreignKey: "usuario_id",
+    as: "historial"
+});
+```
+
+Esto significa que un usuario puede tener múltiples registros en `historial_usuarios`.
+
+También se definió la relación inversa:
+
+```
+JS
+
+HistorialUsuario.belongsTo(User, {
+    foreignKey: "usuario_id",
+    as; "usuario"
+});
+```
+
+Esto indíca que cada registro del historial pertenece a un usuario.
+
+Las asociaciones se centralizaron en `models/associations.js` para evitar dependencias circulares entre los modelos.
+
+#### Consulta de datos relacionados
+
+Se creó la ruta:
+
+`GET /usuarios/orm/historial`
+
+Esta ruta utiliza Sequelize y el parámetro `include` para obtener los usuarios junto con sus registros de historial relacionados.
+
+La consulta utiliza la asociación previamente definida:
+
+```
+JS
+
+const usuarios = await User.findAll({
+    attributes: ["id", "nombre", "email"],
+    include: [
+	{
+	    association: "historial",
+	    attributes: ["id", "accion", "fecha"]
+	}
+    ]
+});
+```
+
+El uso de `include` permite obtener los datos relacionados en una sola consulta ORM y entregarlos de forma anidada en la respuesta JSON.
+
+#### Resultado
+
+La ruta devuelve los usuarios junto con su historial:
+
+```
+JSON
+
+[
+    {
+	"id": 4,
+	"nombre": "Juan Actualizado",
+	"email": "juan@example.com",
+	"historial": []
+    },
+    {
+	"id": 7,
+	"nombre": "Ana Torres",
+	"email": "ana.transaccion@example.com",
+	"historial": [
+	    {
+		"id": 1,
+		"accion": "Usuario registrado",
+		"fecha": "2026-09-19T03:59:44:000Z"
+	    }
+	]
+    }
+]
+```
+
+En este resultado se puede observar que Juan no posee registros de historial, mientras que Ana posee un registro asociado.
+
+Esto permite comprobar que la relación entre `usuarios` e `historial_usuarios` funciona correctamente mediante Sequelize.
+
+#### Evidencia
+
+Se realizó una prueba mediante:
+
+`GET /usuarios/orm/historial`
+
+La respuesta obtenida muestra los usuarios y sus registros relacionados de forma anidada.
+
+![captura-relacion-orm](/docs/captura-relacion-orm-L6-M7.png)
+
+---

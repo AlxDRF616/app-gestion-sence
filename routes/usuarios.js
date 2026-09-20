@@ -5,7 +5,7 @@ const express = require("express");
 const db = require("../config/database");
 
 //Importación del modelo User para el ORM
-const User = require("../models/User");
+const { User } = require("../models/associations");
 
 // Crea un router de Express.
 const router = express.Router();
@@ -270,6 +270,28 @@ router.get("/usuarios/orm", async (req, res) => {
 	res.status(500).json({
 	    error: "No fie posible consultar los usuarios mediante ORM."
 	});
+    }
+});
+
+router.get("/usuarios/orm/historial", async (req, res) => {
+    try {
+        const usuarios = await User.findAll({
+            attributes: ["id", "nombre", "email"],
+            include: [
+                {
+                    association: "historial",
+                    attributes: ["id", "accion", "fecha"]
+                }
+            ]
+        });
+
+        res.json(usuarios);
+    } catch (error) {
+        console.error("Error al consultar usuarios con historial:", error.message);
+
+        res.status(500).json({
+            error: "No fue posible consultar los usuarios y su historial."
+        });
     }
 });
 
