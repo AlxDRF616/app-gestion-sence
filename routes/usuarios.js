@@ -7,199 +7,35 @@ const db = require("../config/database");
 //Importación del modelo User para el ORM
 const { User } = require("../models/associations");
 
+const {
+    obtenerUsuarios,
+    obtenerUsuarioPorId,
+    crearUsuario,
+    actualizarUsuario,
+    eliminarUsuario
+} = require("../controllers/usuariosController");
+
+const {
+    validarUsuario,
+    validarActualizacionUsuario
+} = require("../middlewares/validarUsuario");
+
 // Crea un router de Express.
 const router = express.Router();
 
 //Ruta GET para obtener los usuarios.
-router.get("/usuarios", (req, res) => {
-    db.query(
-        "SELECT id, nombre, email, fecha_creacion FROM usuarios",
-        (error, resultados) => {
-            if (error) {
-                console.error("Error al consultar usuarios:", error.message);
-                return res.status(500).json({
-                    error: "No fue posible obtener los usuarios."
-                });
-            }
-            // Procesa los resultados antes de enviarlos al cliente.
-            const usuarios = resultados.map((usuario) => ({
-                id: usuario.id,
-                nombre: usuario.nombre,
-                email: usuario.email,
-                fecha_creacion: usuario.fecha_creacion
-            }));
-            res.json(usuarios);
-        }
-    );
-});
+router.get("/usuarios", obtenerUsuarios);
 
-// GET para obtener un usuario en específico
-router.get("/usuarios/:id", (req, res) => {
-    const { id } = req.params;
-
-    db.query(
-        "SELECT id, nombre, email, fecha_creacion FROM usuarios WHERE id = ?",
-        [id],
-        (error, resultados) => {
-            if (error) {
-                console.error("Error al consultar usuario:", error.message);
-
-                return res.status(500).json({
-                    error: "No fue posible obtener el usuario."
-                });
-            }
-
-            if (resultados.length === 0) {
-                return res.status(404).json({
-                    error: "Usuario no encontrado."
-                });
-            }
-
-            res.json(resultados[0]);
-        }
-    );
-});
+// GET para obtener un usuario por ID
+router.get("/usuarios/:id", obtenerUsuarioPorId);
 
 // Ruta PUT para actualizar los datos de un usuario.
-router.put("/usuarios/:id", (req, res) => {
-    const { id } = req.params;
-    const { nombre, email } = req.body;
-
-    // Verifica que al menos uno de los campos permitidos haya sido enviado.
-    if (!nombre && !email) {
-        return res.status(400).json({
-            error: "Debe proporcionar nombre o email para actualizar."
-        });
-    }
-
-    // Verifica previamente que el usuario exista.
-    db.query(
-        "SELECT id FROM usuarios WHERE id = ?",
-        [id],
-        (error, resultados) => {
-            if (error) {
-                console.error("Error al verificar usuario:", error.message);
-                return res.status(500).json({
-                    error: "No fue posible verificar el usuario."
-                });
-            }
-
-            if (resultados.length === 0) {
-                return res.status(404).json({
-                    error: "Usuario no encontrado."
-                });
-            }
-
-            // Construye la consulta según los campos recibidos.
-            const campos = [];
-            const valores = [];
-
-            if (nombre) {
-                campos.push("nombre = ?");
-                valores.push(nombre);
-            }
-
-            if (email) {
-                campos.push("email = ?");
-                valores.push(email);
-            }
-
-            valores.push(id);
-
-            const consulta = `UPDATE usuarios SET ${campos.join(", ")} WHERE id = ?`;
-
-            // Ejecuta la actualización después de comprobar que el usuario existe.
-            db.query(consulta, valores, (error) => {
-                if (error) {
-                    console.error("Error al actualizar usuario:", error.message);
-                    return res.status(500).json({
-                        error: "No fue posible actualizar el usuario."
-                    });
-                }
-
-                res.json({
-                    mensaje: "Usuario actualizado correctamente."
-                });
-            });
-        }
-    );
-});
+router.put("/usuarios/:id", validarActualizacionUsuario, actualizarUsuario);
 
 // Ruta DELETE para eliminar un usuario.
-router.delete("/usuarios/:id", (req, res) => {
-    const { id } = req.params;
+router.delete("/usuarios/:id", eliminarUsuario);
 
-    // Verifica previamente que el usuario exista.
-    db.query(
-        "SELECT id FROM usuarios WHERE id = ?",
-        [id],
-        (error, resultados) => {
-            if (error) {
-                console.error("Error al verificar usuario:", error.message);
-                return res.status(500).json({
-                    error: "No fue posible verificar el usuario."
-                });
-            }
-
-            if (resultados.length === 0) {
-                return res.status(404).json({
-                    error: "Usuario no encontrado."
-                });
-            }
-
-            // Elimina el usuario después de comprobar que existe.
-            db.query(
-                "DELETE FROM usuarios WHERE id = ?",
-                [id],
-                (error) => {
-                    if (error) {
-                        console.error("Error al eliminar usuario:", error.message);
-                        return res.status(500).json({
-                            error: "No fue posible eliminar el usuario."
-                        });
-                    }
-
-                    res.json({
-                        mensaje: "Usuario eliminado correctamente."
-                    });
-                }
-            );
-        }
-    );
-});
-
-router.post("/usuarios", (req, res) => {
-    const { nombre, email, password } = req.body;
-
-    if (!nombre || !email || !password) {
-        return res.status(400).json({
-            error: "Nombre, email y password son obligatorios."
-        });
-    }
-
-    db.query(
-        "INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)",
-        [nombre, email, password],
-        (error, resultado) => {
-            if (error) {
-                console.error("Error al crear usuario:", error.message);
-
-                return res.status(500).json({
-                    error: "No fue posible crear el usuario."
-                });
-            }
-
-            res.status(201).json({
-                mensaje: "Usuario creado correctamente.",
-                usuario: {
-                    id: resultado.insertId,
-                    nombre,
-                    email
-                }
-            });
-        }
-    );
-});
+router.post("/usuarios", validarUsuario, crearUsuario);
 
 // Ruta POST para registrar un usuario y crear su historial dentro de una transacción.
 router.post("/usuarios/transaccion", (req, res) => {

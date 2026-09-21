@@ -1,3 +1,6 @@
+// Carga las variables de entorno desde el archivo .env.
+require("dotenv").config();
+
 // Importa el módulo mysql2 para conectarse a MySQL.
 const mysql = require("mysql2");
 

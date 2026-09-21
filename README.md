@@ -909,3 +909,95 @@ Los endpoints REST principales funcionan correctamente y permiten realizar las o
 La implementación utiliza consultas SQL parametrizadas para interactuar con MySQL y mantiene las rutas dentro del archivo `routes/usuarios.js`. La separación de la lógica en controladores será abordada en la siguiente lección.
 
 ---
+
+### Lección 2: Implementación de una API REST
+
+En esta lección se reorganizó la implementación de la API REST para separar las responsabilidades entre rutas, controladores y middlewares.
+
+La estructura utilizada permite que las rutas definan los endpoints, los controladores contengan la lógica de acceso a los datos y los middlewares realicen validaciones antes de ejecutar determinadas operaciones.
+
+#### Estructura utilizada
+
+La implementación se organizó de la siguiente manera:
+
+```
+routes/
+    usuarios.js (Define los endpoints de la API.)
+
+controllers/
+    usuariosController.js (Contiene la lógica de las operaciones sobre usuarios.)
+
+middlewares/
+    validarUsuario.js (Contiene las validaciones de las solicitudes.)
+
+```
+Esta separación permite mantener el código organizado y facilita su mantenimiento y amplicación.
+
+#### Controladores
+
+Se creó `controllers/usuariosController.js` con las funciones correspondientes a las principales operaciones REST:
+
+- `obtenerUsuarios`: Obtiene todos los usuarios.
+- `obtenerUsuarioPorId`: Obtiene un usuario mediante su ID.
+- `crearUsuario`: Registra un nuevo usuario.
+- `actualizarUsuario`: Modifica los datos permitidos de un usuario.
+- `eliminarUsuario`: Elimina un usuario existente.
+
+Las rutas de `routes/usuarios.js` se encargan de asociar cada endpoint con su controlador correspondiente.
+
+#### Validación mediante middleware
+
+Se creó `middlewares/validarUsuario.js` para centralizar las validaciones de entrada.
+
+Para `POST /usuarios/:id` se verifica que se proporcione al menos uno de los campos permitidos:
+
+- `nombre`
+- `email`
+
+Cuando una solicitud no cumple estas condiciones, el middleware responde con código HTTP `400` y evita que la operación llegue al controlador.
+
+#### Manejo de errores
+
+Los controladores verifican situaciones como:
+
+- Usuario inexistente -> respuesta HTTP `404`.
+- Datos obligatorios ausentes -> respuesta HTTP `400`.
+- Errores durante las consultas MySQL -> respuesta HTTP `500`.
+
+Los mensajes enviados al cliente no exponen detalles internos de la base de datos.
+
+#### Pruebas realizadas
+
+Se realizaron pruebas con la API utilizando `curl` desde la terminal y el servidor conectado a MySQL.
+
+Se comprobó:
+
+- `GET /usuarios` -> Obtiene correctamente los usuarios.
+- `GET /usuarios/:id` -> Obtiene correctamente un usuario existente.
+- `POST /usuario` -> Crea correctamente un usuario.
+- `POST /usuarios` sin `password` -> devuelve `400`.
+- `PUT /usuarios/:id` -> Actualiza correctamente un usuario.
+- `PUT /usuarios/:id` sin datos de actualización -> Devuelve `400`.
+- `DELETE /usuarios/:id` -> Elimina correctamente un usuario.
+- `DELETE /usuarios/:id` con un ID inexistente -> Devuelve `404`.
+
+Las pruebas de creación, actualización y eliminación utilizaros un usuario temporal, que posteriormente fue eliminado correctamente.
+
+#### Evidencias
+
+- Pruebas exitosas de Endpoints
+
+![capturad-tests-exito](/docs/captura-tests-exito-L2-M8.png)
+
+- Validaciones y respuestas de error
+
+![captura-tests-error](/docs/captura-tests-error-L2-M8.png)
+
+
+#### ¿Porqué la separación?
+
+La separación entre rutas, controladores y middlewares evita concentrar toda la lógica de la aplicación en un único archivo.
+
+Las rutas se encargan de definir los endpoints, los controladores gestionan las operaciones sobre los datos y los middlewares permiten reutilizar validaciones antes de ejecutar determinadas operaciones.
+
+Esta estructura facilita el mantenimiento del proyecto y permite incorporar nuevas funcionalidades en las siguientes etapas.
