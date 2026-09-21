@@ -33,6 +33,33 @@ router.get("/usuarios", (req, res) => {
     );
 });
 
+// GET para obtener un usuario en específico
+router.get("/usuarios/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.query(
+        "SELECT id, nombre, email, fecha_creacion FROM usuarios WHERE id = ?",
+        [id],
+        (error, resultados) => {
+            if (error) {
+                console.error("Error al consultar usuario:", error.message);
+
+                return res.status(500).json({
+                    error: "No fue posible obtener el usuario."
+                });
+            }
+
+            if (resultados.length === 0) {
+                return res.status(404).json({
+                    error: "Usuario no encontrado."
+                });
+            }
+
+            res.json(resultados[0]);
+        }
+    );
+});
+
 // Ruta PUT para actualizar los datos de un usuario.
 router.put("/usuarios/:id", (req, res) => {
     const { id } = req.params;
@@ -137,6 +164,39 @@ router.delete("/usuarios/:id", (req, res) => {
                     });
                 }
             );
+        }
+    );
+});
+
+router.post("/usuarios", (req, res) => {
+    const { nombre, email, password } = req.body;
+
+    if (!nombre || !email || !password) {
+        return res.status(400).json({
+            error: "Nombre, email y password son obligatorios."
+        });
+    }
+
+    db.query(
+        "INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)",
+        [nombre, email, password],
+        (error, resultado) => {
+            if (error) {
+                console.error("Error al crear usuario:", error.message);
+
+                return res.status(500).json({
+                    error: "No fue posible crear el usuario."
+                });
+            }
+
+            res.status(201).json({
+                mensaje: "Usuario creado correctamente.",
+                usuario: {
+                    id: resultado.insertId,
+                    nombre,
+                    email
+                }
+            });
         }
     );
 });

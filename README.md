@@ -855,3 +855,57 @@ La respuesta obtenida muestra los usuarios y sus registros relacionados de forma
 ![captura-relacion-orm](/docs/captura-relacion-orm-L6-M7.png)
 
 ---
+
+## Módulo 8
+
+### Lección 1: APIs RESTful
+
+En esta lección se diseñaron e implementaron los principales endpoints REST de la aplicación para gestionar usuarios mediante los métodos HTTP `GET`, `POST`, `PUT` Y `DELETE`.
+
+#### Diseño de endpoints
+
+La API utiliza el recurso `usuarios` como recurso principal y sigue una estructura basada en convenciones REST:
+
+| Método   | Endpoint        | Descripción                                   |
+| -------- | --------------- | --------------------------------------------- |
+| `GET`    | `/usuarios`     | Obtiene todos los usuarios.                   |
+| `GET`    | `/usuarios/:id` | Obtiene un usuario específico mediante su ID. |
+| `POST`   | `/usuarios`     | Crea un nuevo usuario.                        |
+| `PUT`    | `/usuarios/:id` | Actualiza los datos de un usuario existente.  |
+| `DELETE` | `/usuarios/:id` | Elimina un usuario existente.                 |
+
+Los endpoints utilizan el sustantivo `usuarios` como recurso y los métodos HTTP determinan la operación que se realiza sobre este recurso.
+
+#### Validación y manejo de errores
+
+El endpoint `POST /usuarios` valida que los campos `nombre`, `email` y `password` estén presentes antes de realizar la inserción en la base de datos.
+
+Si falta alguno de estos campos, la API responde con código `400` y un mensaje indicando los campos obligatorios.
+
+Los endpoints que trabajan con un usuario específico verifican si el registro existe. Cuando no se encuentra el usuario solicitado, la API responde con código `404`.
+
+#### Pruebas realizadas
+
+Las rutas fueron probadas mediante `curl` desde la terminal, verificando tanto operaciones exitosas como casos de error.
+
+Se comprobó:
+
+- Creación de un usuario mediante `POST /usuarios`.
+- Rechazo de una solicitud `POST` sin todos los campos obligatorios.
+- Consulta de un usuario mediante `GET /usuarios/:id`.
+- Respuesta `404`  al consultar un usuario inexistente.
+- Actualización de un usuario mediante `PUT /usuarios/:id`.
+- Eliminación de un usuario mediante `DELETE /usuarios/:id`.
+- Verificación posterior de que el usuario eliminado ya no existe.
+
+Como evidencia de las pruebas se incluye:
+
+![captura-api-rest](/docs/captura-api-rest-L1-M8.png)
+
+#### Resultado
+
+Los endpoints REST principales funcionan correctamente y permiten realizar las operaciones básicas de creación, consulta, actualización y eliminación de usuarios utilizando los métodos HTTP correspondientes.
+
+La implementación utiliza consultas SQL parametrizadas para interactuar con MySQL y mantiene las rutas dentro del archivo `routes/usuarios.js`. La separación de la lógica en controladores será abordada en la siguiente lección.
+
+---
