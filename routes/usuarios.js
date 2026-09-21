@@ -20,6 +20,8 @@ const {
     validarActualizacionUsuario
 } = require("../middlewares/validarUsuario");
 
+const upload = require("../middlewares/upload");
+
 // Crea un router de Express.
 const router = express.Router();
 
@@ -189,6 +191,22 @@ router.get("/usuarios/orm/historial", async (req, res) => {
             error: "No fue posible consultar los usuarios y su historial."
         });
     }
+});
+
+router.post("/upload", upload.single("archivo"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({
+            error: "No se recibió ningún archivo."
+        });
+    }
+
+    res.status(201).json({
+        mensaje: "Archivo subido correctamente.",
+        archivo: {
+            nombre: req.file.filename,
+            ruta: `/uploads/${req.file.filename}`
+        }
+    });
 });
 
 module.exports = router;
