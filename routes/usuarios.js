@@ -20,13 +20,19 @@ const {
     validarActualizacionUsuario
 } = require("../middlewares/validarUsuario");
 
+const verificarToken = require("../middlewares/auth");
+
 const upload = require("../middlewares/upload");
+
+const { login } = require("../controllers/authController");
 
 // Crea un router de Express.
 const router = express.Router();
 
+router.post("/login", login);
+
 //Ruta GET para obtener los usuarios.
-router.get("/usuarios", obtenerUsuarios);
+router.get("/usuarios", verificarToken, obtenerUsuarios);
 
 // GET para obtener un usuario por ID
 router.get("/usuarios/:id", obtenerUsuarioPorId);
@@ -35,7 +41,7 @@ router.get("/usuarios/:id", obtenerUsuarioPorId);
 router.put("/usuarios/:id", validarActualizacionUsuario, actualizarUsuario);
 
 // Ruta DELETE para eliminar un usuario.
-router.delete("/usuarios/:id", eliminarUsuario);
+router.delete("/usuarios/:id",verificarToken , eliminarUsuario);
 
 router.post("/usuarios", validarUsuario, crearUsuario);
 

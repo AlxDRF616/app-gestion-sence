@@ -1076,3 +1076,174 @@ Se comprobó:
 La funcionalidad de subida de archivos se encuentra operativa. El backend recibe archivos, controla los tipos permitidos, los almacena en `public/uploads/` y permite acceder posteriormente a ellos mediante Express.
 
 > **En esta implementación no se asociaron los archivos con registros de la base de datos.**
+
+---
+
+### Lección 4: Securización mediante JWT
+
+En esta lección se incorporó autenticación mediante JSON Web Tokens (JWT) para proteger determinados endpoints de la API.
+
+El objetivo fue implementar un mecanismo de autenticación que permita generar un token al iniciar sesión y utilizarlo posteriormente para acceder a rutas protegidas.
+
+#### Instalación de JWT 
+
+Se incorporó la dependencia `jsonwebtoken` mediante `npm`.
+
+Esta biblioteca permite generar y verificar tokens JWT dentro de la aplicación.
+
+La aplicación utiliza una variable de entorno denominada `JWT_SECRET` para firmar y verificar los tokens.
+
+Esta variable se encuentra definida en `.env` y también se incluye como referencia en `.env.example`.
+
+#### Endpoint de autenticación
+
+Se creó el endpoint:
+
+`POST /login`
+
+Este endpoint recibe:
+
+- `email`
+- `password`
+
+La ruta consulta el usuario correspondiente en la base de datos y verifica las credenciales proporcionadas.
+
+Cuando las credenciales son correctas, se genera un JWT que contiene información básica del usuario:
+
+- `id`
+- `email`
+
+El token se configura con una duración de una hora.
+
+La respuesta exitosa tiene la siguiente estructura:
+
+```
+JSON
+
+{
+    "mensaje": "Autenticación exitosa.",
+    "token": "..."
+}
+```
+
+Si no se proporciona el email o la contraseña, la API responde con HTTP `400`.
+
+Si las credenciales no son válidas, la API responde con HTTP `401`.
+
+#### Middleware de autenticación
+
+Se creó el middleware:
+
+`middlewares/auth.js`
+
+Este middleware obtiene el token desde el encabezado HTTP:
+
+`Authorization: Bearer <token>`
+
+Posteriormente utiliza `jwt.verify()` para comprobar la firma y vigencia del token.
+
+Si el token es válido, la solicitud continúa hacia el controlador correspondiente.
+
+Si no se proporciona un token, la API responde con HTTP `401`.
+
+Si el token es inválido o está expirado, la API también responde con HTTP `401`.
+
+#### Rutas protegidas
+
+Se protegieron las siguientes rutas:
+
+- `GET /usuarios`
+- `DELETE /usuarios/:id`
+
+En ambos casos, el middleware `verificarToken` se ejecuta antes del controlador.
+
+Por ejemplo:
+
+```
+JS
+
+router.get("/usuarios", verificarToken, obtenerUsuarios);
+router.delete("/usuarios/:id", verificarToken, eliminarUsuario);
+```
+
+Esto permite impedir que usuarios no autenticados puedan acceder directamente a estas operaciones.
+
+#### Pruebas realizadas
+
+Se realizaron diferentes pruebas para comprobar el funcionamiento de la autenticación.
+
+#### Login exitoso
+
+Se comprobó que `POST /login` genera correctamente un JWT cuando las credenciales son válidas.
+
+![captura-login-jwt](/docs/M8/L4/captura-login-jwt-L4-M8.png)
+
+#### Acceso sin token
+
+Se realizó una solicitud a `GET /usuarios` sin enviar el encabezado `Authorization`.
+
+La API respondió:
+
+`HTTP 401 Unauthorized`
+
+con el mensaje:
+
+```
+JSON
+
+{
+    "error": "Token de autenticación requerido."
+}
+```
+
+![captura-ruta-protegida-sin-token](/docs/M8/L4/captura-ruta-protegida-sin-token-L4-M8.png)
+
+#### Acceso con token válido
+
+Se realizó nuevamente la solicitud a `GET /usuarios`, esta vez enviando un JWT válido mediante:
+
+`Authorization: Bearer <token>`
+
+La API respondió correctamente con `HTTP 200 OK` y entregó los registros de usuarios.
+
+![captura-ruta-protegida-con-token](/docs/M8/L4/captura-ruta-protegida-con-token-L4-M8.png)
+
+#### Acceso con token expirado
+
+Para comprobar la validación de expiración se generó un token de prueba con una duración de un segundo.
+
+Después de esperar a que expirara, se utilizó el token para acceder a una ruta protegida.
+
+La API respondió:
+
+`HTTP 401 Unauthorized`
+
+con el mensaje:
+
+```
+JSON
+
+{
+    "error": "Token inválido o expirado."
+}
+```
+
+También se comprobó la protección de `DELETE /usuarios/:id` utilizando un ID inexistente. Sin token la solicitud fue rechazada con `401`, mientras que con un token válido la solicitud llegó al controlador y respondió `404 Usuario no encontrado`.
+
+![captura-token-expirado](/docs/M8/L4/captura-token-expirado-L4-M8.png)
+
+#### Almacenamiento del token
+
+El cliente debe enviar el JWT en el encabezado `Authorization` utilizando el esquema `Bearer`.
+
+En esta implementación no se desarrolló una interfaz frontend ni un mecanismo específico de almacenamiento persistente del token. LAs pruebas se realizaron directamente mediante solicitudes HTTP utilizando `curl`.
+
+#### Resultado
+
+La funcionalidad de autenticación mediante JWT se encuentra operativa.
+
+La aplicación permite iniciar sesión mediante `POST /login`, generar un token con una vigencia definida y proteger endpoints mediante un middleware que valida la existencia, firma y expiración del JWT.
+
+Las rutas protegidas rechazan solicitudes sin autenticación y permiten continuar las solicitudes que presentan un token válida.
+
+---

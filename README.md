@@ -193,6 +193,85 @@ Los archivos almacenados pueden ser consultados mediante:
 
 `http://localhost:3000/uploads/nombre-del-archivo`
 
+## Autenticación mediante JWT
+
+La aplicación utiliza JSON Web Tokens (JWT) para proteger determinados endpoints de la API.
+
+La clave utilizada para firmar y verificar los tokens se configura mediante la variable de entorno:
+
+`JWT_SECRET=tu_clave_secreta`
+
+Esta variable debe configurarse en el archivo `.env`. El archivo `.env.example` contiene una refencia para facilitar la configuración del proyecto.
+
+### Iniciar sesión
+
+Para obtener un token JWT se debe realizar una solicitud `POST` a:
+
+`/login`
+
+La solicitud debe enviar las credenciales del usuario en formato JSON:
+
+```
+JSON
+
+{
+    "email": "correo@example.com",
+    "password": "contraseña_simulada"
+}
+```
+
+Si las credenciales son correctas, la API responde con un token:
+
+```
+JSON
+
+{
+    "mensaje": "Autenticación exitosa.",
+    "token": "..."
+}
+```
+
+El token tiene una vigencia de una hora.
+
+### Uso del token
+
+Las rutas protegidas requieren enviar el JWT mediante el encabezado HTTP:
+
+`Authorization: Bearer <token>`
+
+Por ejemplo:
+
+```
+Bash
+
+curl -i http://localhost:3000/usuarios \
+-H "Authorization: Bearer PEGA_AQUÍ_EL_TOKEN"
+
+```
+
+### Rutas protegidas
+
+Actualmente requieren autenticación mediante JWT:
+
+- `GET /usuarios`
+- `DELETE /usuarios/:id`
+
+Si se intenta acceder a estas rutas sin un token, la API responde con HTTP `401` y un mensaje indicando que se requiere autenticación.
+
+Si el token es inválido o está expirado, la API también responde con HTTP `401`.
+
+### Ejemplo de flujo de autenticación
+
+El uso de las rutas protegidas sigue el siguiente flujo:
+
+1. El cliente envía sus credenciales mediante `POST /login`.
+2. La API verifica las credenciales.
+3. Si son correctar, genera y devuelve un JWT.
+4. El cliente envía el JWT en el encabezado `Authorization` al utilizar una ruta protegida.
+5. El servidor verifica la validez y vigencia del token.
+6. Si el token es válido, se permite continuar con la operación.
+7. Si el token falta, es inválido o está expirando, la solicitud es rechazada con HTTP `401`.
+
 ## Manejo de errores
 
 La API utiliza códigos de estado HTTP para informar el resultado de las operaciones.
